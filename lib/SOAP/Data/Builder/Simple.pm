@@ -10,6 +10,11 @@ our @EXPORT_OK = qw( data header to_soap );
 
 use List::Util qw( pairs );
 use SOAP::Data::Builder;
+use Hook::LexWrap;
+
+my $wrap = wrap 'SOAP::Data::Builder::get_as_data' => post => sub {
+    return map { $_->type('') unless $_->type; $_ } @{ $_[-1] };
+};
 
 sub data {
     my $data = shift;
