@@ -1,5 +1,6 @@
 requires 'base'                => 0;
 requires 'List::Util'          => 0;
+requires 'Safe::Isa'           => 0;
 requires 'SOAP::Data::Builder' => 0;
 requires 'SOAP::Lite'          => 0;
 

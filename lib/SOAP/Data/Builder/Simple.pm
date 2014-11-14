@@ -9,6 +9,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw( data header );
 
 use List::Util qw( pairs );
+use Safe::Isa;
 use SOAP::Lite;
 
 # So we can stop SOAP::Lite adding 'xsi:nil="true"'
@@ -58,12 +59,12 @@ sub _add {
                     \SOAP::Data->value( _add( $element, $value ) ) )
                     if @{$value};
 
-            } elsif ( !ref $value ) {
+            } elsif ( $value->$_isa('SOAP::Data') ) {
+                $element->value( \$value );
 
+            } else {
                 $element->value($value);
             }
-
-            # ignore $value if hashref
 
             push @return, $element;
         }
