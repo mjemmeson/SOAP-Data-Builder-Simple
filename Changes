@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  - Switched from using SOAP::Data::Builder to calling SOAP::Data directly
+  - Improved interface and documentation
+
 0.01  2014-11-03 10:56:43 GMT
 
   - Initial release
