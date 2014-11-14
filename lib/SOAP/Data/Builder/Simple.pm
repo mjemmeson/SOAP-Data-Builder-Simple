@@ -51,7 +51,6 @@ sub _add {
 
             my $element = $is_header ? SOAP::Header->new : SOAP::Data->new;
             $element->name($key);
-#            $element->type('');
 
             if ( ref $value eq 'ARRAY' ) {
 
@@ -84,7 +83,7 @@ SOAP::Data::Builder::Simple - Simplified way of creating data structures for SOA
 
 =head1 SYNOPSIS
 
-    use SOAP::Data::Builder::Simple;
+    use SOAP::Data::Builder::Simple qw( header data );
 
     # note - uses arrayrefs to preserve element order
 
@@ -111,8 +110,53 @@ SOAP::Data::Builder::Simple - Simplified way of creating data structures for SOA
 
 =head1 DESCRIPTION
 
-Simplified interface to L<SOAP::Data::Builder> for creating SOAP::Data objects
-for use with L<SOAP::Lite>.
+Simplified interface to L<SOAP::Data> for creating data structures for use with
+L<SOAP::Lite>.
+
+=head1 DATA STRUCTURES
+
+=head2 Simple element (value only)
+
+    # SOAP::Data->name($name)->value($value)
+    $name => $value
+
+=head2 Element with attributes
+
+    # SOAP::Data->name( $name => $value )->type($type)->attr( \%attr )
+    $name => [
+        _attr  => \%attr,
+        _value => $value,
+        _type  => $type,
+    ]
+
+=head2 Element with children
+
+    # SOAP::Data->name(
+    #     $name => \SOAP::Data->value(
+    #         SOAP::Data->name( child1 => $v1 ),
+    #         SOAP::Data->name( child2 => ... ),
+    #         ...
+    #     )
+    # )->type($type)->attr( \%attr )
+    $name => [
+        _attr  => \%attr,
+        _type  => $type,
+        child1 => $v1,
+        child2 => [ ... ],
+        ...
+    ]
+
+=head1 FUNCTIONS
+
+=head2 header
+
+Identical to C<data> except the top level element(s) are of type SOAP::Header.
+
+=head2 data
+
+Returns a list of one or more SOAP::Data objects. Each object may have further
+SOAP::Data objects as children. Arrayrefs are used to preserve order of child
+elements (ordering of C<_value>, C<_type>, C<_attr>, etc is not important).
 
 =head1 SEE ALSO
 
@@ -121,6 +165,10 @@ for use with L<SOAP::Lite>.
 =item *
 
 L<SOAP::Data::Builder>
+
+=item *
+
+L<SOAP::Lite>
 
 =back
 
