@@ -6,55 +6,72 @@ use strict;
 use warnings;
 
 use base 'Exporter';
-our @EXPORT_OK = qw( data header to_soap );
+our @EXPORT_OK = qw( data header );
 
 use List::Util qw( pairs );
-use SOAP::Data::Builder;
+use SOAP::Lite;
+
+# So we can stop SOAP::Lite adding 'xsi:nil="true"'
+sub SOAP::Serializer::as_nonil {
+    my ( $self, $value, $name, $type, $attr ) = @_;
+    delete $attr->{'xsi:nil'};
+    return [ $name, $attr, $value ];
+}
 
 sub data {
-    my $data = shift;
-
-    my $sdb = SOAP::Data::Builder->new();
-
-    _add( $sdb, $data );
-
-    return $sdb->to_soap_data;
+    return _add( undef, \@_ );
 }
 
 sub header {
-    my $data = shift;
-
-    my $sdb = SOAP::Data::Builder->new();
-
-    _add( $sdb, $data, 1 );
-
-    return $sdb->to_soap_data;
+    return _add( undef, \@_, 1 );
 }
 
 sub _add {
-    my ( $element, $data, $is_header ) = @_;
+    my $parent    = shift;
+    my @data      = @{ shift || [] };
+    my $is_header = shift() ? 1 : 0;
 
-    foreach my $pair ( pairs( @{ $data || [] } ) ) {
-        my ( $name, $v ) = @{$pair};
+    # first argument can be hashref
+    my $args = ref $data[0] eq 'HASH' ? shift @data : {};
 
-        unless ( ref $v ) {
-            $element->add_elem(
-                header => $is_header ? 1 : 0,
-                name   => $name,
-                value  => $v
-            );
-            next;
+    # allow arrayref for backwards compatibility
+    @data = @{ $data[0] } if ref $data[0] eq 'ARRAY';
+
+    my @return;
+
+    foreach my $pair ( pairs @data ) {
+
+        my ( $key, $value ) = @{$pair};
+
+        # underscore prefix - pass through to parent
+        if ( $key =~ m{^_(.+)} ) {
+            $parent->$1($value);
+
+        } else {
+
+            my $element = $is_header ? SOAP::Header->new : SOAP::Data->new;
+            $element->name($key);
+#            $element->type('');
+
+            if ( ref $value eq 'ARRAY' ) {
+
+                $element->value(
+                    \SOAP::Data->value( _add( $element, $value ) ) )
+                    if @{$value};
+
+            } elsif ( !ref $value ) {
+
+                $element->value($value);
+            }
+
+            # ignore $value if hashref
+
+            push @return, $element;
         }
 
-        if ( $name eq '_attr' && ref $v eq 'HASH' ) {
-            $element->{attributes} = $v;
-            next;
-        }
-
-        my $added = $element->add_elem( name => $name );
-
-        _add( $added, $v, $is_header );
     }
+
+    return @return;
 }
 
 1;
@@ -63,7 +80,7 @@ __END__
 
 =head1 NAME
 
-SOAP::Data::Builder::Simple - Simplified interface to SOAP::Data::Builder
+SOAP::Data::Builder::Simple - Simplified way of creating data structures for SOAP::Lite
 
 =head1 SYNOPSIS
 
@@ -72,19 +89,19 @@ SOAP::Data::Builder::Simple - Simplified interface to SOAP::Data::Builder
     # note - uses arrayrefs to preserve element order
 
     my @headers = header(
-        [   'eb:MessageHeader' => [
-                _attr =>
-                    { 'eb:version' => "2.0", 'SOAP::mustUnderstand' => "1" },
-                'eb:From' => [
-                    'eb:PartyId' => 'uri:example.com',
-                    'eb:Role'    => 'http://rosettanet.org/roles/Buyer',
-                ],
-                'eb:DuplicateElimination' => undef,
-            ]
+        'eb:MessageHeader' => [
+            _attr => { 'eb:version' => "2.0", 'SOAP::mustUnderstand' => "1" },
+            'eb:From' => [
+                'eb:PartyId' => 'uri:example.com',
+                'eb:Role'    => 'http://rosettanet.org/roles/Buyer',
+            ],
+            'eb:DuplicateElimination' => [
+                _type => 'nonil'    # prevent SOAP::Lite adding 'xsi:nil="true"'
+            ],
         ]
     );
 
-    my @data = data( [ foo => 'bar' ] );
+    my @data = data( foo => 'bar' );
 
     my $result = SOAP::Lite
         -> uri($uri);

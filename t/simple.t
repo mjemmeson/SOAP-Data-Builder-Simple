@@ -2,7 +2,7 @@ use Test::More;
 use strict;
 use warnings;
 
-use SOAP::Lite ( +trace => 'all', maptype => {} );
+use SOAP::Lite  +trace => 'all';
 
 use SOAP::Data::Builder;
 use SOAP::Data::Builder::Simple qw/ header data /;
@@ -14,7 +14,7 @@ sub compare {
 
     note $name if $name;
 
-    is $sdb->(), $sdb_simple->(), "output matched ok";
+    is $sdb_simple->(), $sdb->(), "output matched ok";
 }
 
 compare(
@@ -56,25 +56,27 @@ compare(
     },
 
     sub {
+
         my @headers = header(
-            [   'eb:MessageHeader' => [
-                    _attr => {
-                        'eb:version'           => "2.0",
-                        'SOAP::mustUnderstand' => "1"
-                    },
-                    'eb:From' => [
-                        'eb:PartyId' => 'uri:example.com',
-                        'eb:Role'    => 'http://rosettanet.org/roles/Buyer',
-                    ],
-                    'eb:DuplicateElimination' => undef,
-                ]
+            'eb:MessageHeader' => [
+                _attr => {
+                    'eb:version'           => "2.0",
+                    'SOAP::mustUnderstand' => "1"
+                },
+                'eb:From' => [
+                    'eb:PartyId' => 'uri:example.com',
+                    'eb:Role'    => 'http://rosettanet.org/roles/Buyer',
+                ],
+                'eb:DuplicateElimination' => undef,
             ]
         );
-        my @data = data( [ foo => 'bar' ] );
+        my @data = data( foo => 'bar' );
 
-        my $soap = SOAP::Data->name(
+        my $soap_data = SOAP::Data->name(
             'SOAP:ENV' => \SOAP::Data->value( @headers, @data ) );
-        return SOAP::Serializer->autotype(0)->readable(0)->serialize($soap);
+
+        return SOAP::Serializer->autotype(0)->readable(0)
+            ->serialize($soap_data);
     }
 );
 
