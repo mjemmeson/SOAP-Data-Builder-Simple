@@ -2,7 +2,8 @@ use Test::More;
 use strict;
 use warnings;
 
-use SOAP::Lite  +trace => 'all';
+#use SOAP::Lite  +trace => 'all';
+use SOAP::Lite;
 
 use SOAP::Data::Builder;
 use SOAP::Data::Builder::Simple qw/ header data /;
