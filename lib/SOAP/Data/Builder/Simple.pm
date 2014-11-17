@@ -46,25 +46,20 @@ sub _add {
 
         # underscore prefix - pass through to parent
         if ( $key =~ m{^_(.+)} ) {
-            $parent->$1($value);
+
+            if ( $1 eq 'value' ) {
+                _add_value( $parent, $value );
+            } else {
+                $parent->$1($value);
+            }
 
         } else {
 
             my $element = $is_header ? SOAP::Header->new : SOAP::Data->new;
+
             $element->name($key);
 
-            if ( ref $value eq 'ARRAY' ) {
-
-                $element->value(
-                    \SOAP::Data->value( _add( $element, $value ) ) )
-                    if @{$value};
-
-            } elsif ( $value->$_isa('SOAP::Data') ) {
-                $element->value( \$value );
-
-            } else {
-                $element->value($value);
-            }
+            _add_value( $element, $value );
 
             push @return, $element;
         }
@@ -72,6 +67,21 @@ sub _add {
     }
 
     return @return;
+}
+
+sub _add_value {
+    my ( $element, $value ) = @_;
+
+    if ( ref $value eq 'ARRAY' ) {
+        $element->value( \SOAP::Data->value( _add( $element, $value ) ) )
+            if @{$value};
+
+    } elsif ( $value->$_isa('SOAP::Data') ) {
+        $element->value( \$value );
+
+    } else {
+        $element->value($value);
+    }
 }
 
 1;

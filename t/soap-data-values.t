@@ -76,13 +76,14 @@ my @tests = (
 
 foreach my $test (@tests) {
 
-    note $test->{name};
+    subtest $test->{name} => sub {
 
-    ok my ($data) = $test->{test}->(), "data()";
+        ok my ($data) = $test->{test}->(), "data()";
 
-    ok my $xml = $soap->serializer->serialize($data), "serialize";
+        ok my $xml = $soap->serializer->serialize($data), "serialize";
 
-    is $xml, $test->{expected}, "XML matches";
+        is $xml, $test->{expected}, "XML matches";
+    };
 
 }
 
