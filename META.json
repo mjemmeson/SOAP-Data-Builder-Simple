@@ -36,9 +36,10 @@
       },
       "runtime" : {
          "requires" : {
-            "List::Util" : "0",
+            "List::Util" : "1.29",
             "SOAP::Data::Builder" : "0",
             "SOAP::Lite" : "0",
+            "Safe::Isa" : "0",
             "base" : "0"
          }
       },
