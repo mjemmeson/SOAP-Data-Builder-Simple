@@ -22,7 +22,7 @@ my @tests = (
             );
         },
         expected =>
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SOAP:ENV xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><SOAP:BODY><foo><abc>123</abc></foo></SOAP:BODY></SOAP:ENV>",
+            qr{^<\?xml version="1.0" encoding="UTF-8"\?><SOAP:ENV .*><SOAP:BODY><foo><abc>123</abc></foo></SOAP:BODY></SOAP:ENV>$},
     },
 
     {   name => "SOAP::Data, with reference",
@@ -35,7 +35,7 @@ my @tests = (
             );
         },
         expected =>
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SOAP:ENV xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><SOAP:BODY><foo><abc>123</abc></foo></SOAP:BODY></SOAP:ENV>",
+            qr{^<\?xml version="1.0" encoding="UTF-8"\?><SOAP:ENV .*"><SOAP:BODY><foo><abc>123</abc></foo></SOAP:BODY></SOAP:ENV>$},
     },
 
     {   name => "SOAP::DATA list, no reference",
@@ -52,7 +52,7 @@ my @tests = (
             );
         },
         expected =>
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SOAP:ENV xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><foo><abc>123</abc><def>456</def></foo></SOAP:ENV>",
+            qr{^<\?xml version="1.0" encoding="UTF-8"\?><SOAP:ENV .*"><foo><abc>123</abc><def>456</def></foo></SOAP:ENV>$},
     },
 
     {   name => "SOAP::DATA list, with reference",
@@ -69,7 +69,7 @@ my @tests = (
             );
         },
         expected =>
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SOAP:ENV xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><foo><abc>123</abc><def>456</def></foo></SOAP:ENV>",
+            qr{^<\?xml version="1.0" encoding="UTF-8"\?><SOAP:ENV .*"><foo><abc>123</abc><def>456</def></foo></SOAP:ENV>$},
     },
 
 );
@@ -82,7 +82,7 @@ foreach my $test (@tests) {
 
         ok my $xml = $soap->serializer->serialize($data), "serialize";
 
-        is $xml, $test->{expected}, "XML matches";
+        like $xml, $test->{expected}, "XML matches";
     };
 
 }
