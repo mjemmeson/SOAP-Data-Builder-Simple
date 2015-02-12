@@ -1,9 +1,9 @@
 package SOAP::Data::Builder::Simple;
 
-our $VERSION = '0.03';
-
 use strict;
 use warnings;
+
+our $VERSION = '0.03';
 
 use base 'Exporter';
 our @EXPORT_OK = qw( data header );
