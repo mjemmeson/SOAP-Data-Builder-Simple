@@ -3,7 +3,7 @@ package SOAP::Data::Builder::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base 'Exporter';
 our @EXPORT_OK = qw( data header );

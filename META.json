@@ -57,7 +57,7 @@
    "provides" : {
       "SOAP::Data::Builder::Simple" : {
          "file" : "lib/SOAP/Data/Builder/Simple.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
          "web" : "https://github.com/mjemmeson/SOAP-Data-Builder-Simple"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04"
 }
 
