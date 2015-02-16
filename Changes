@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  [Maintenance]
+  - more tests
+  - tidying up build process (use Dist::Milla)
+  - fixing test breakages (more general matching of output)
+
 0.03  2014-11-17 10:07:37 GMT
 
   - Allow SOAP::Data objects as values

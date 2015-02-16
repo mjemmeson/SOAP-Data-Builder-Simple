@@ -32,6 +32,7 @@
       "develop" : {
          "requires" : {
             "Dist::Milla" : "v1.0.14",
+            "Dist::Zilla::Plugin::MetaProvides" : "0",
             "Test::Pod" : "1.41"
          }
       },
@@ -41,7 +42,9 @@
             "SOAP::Lite" : "0",
             "Safe::Isa" : "0",
             "base" : "0",
-            "perl" : "5.008"
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
